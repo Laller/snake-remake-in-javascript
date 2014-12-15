@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-Type" content="text/html; charset=UTF-8">	
+		<title>ekanS</title>
+		<link href="style.css" rel="stylesheet">
+		<script src="jquery.min.1.7.js"></script>
+		<script src="ekans.js"></script>
+	</head>
+	<body>
+		<h1>ekanS ---- W.A.S.D.</h1>
+		
+		<button id="startButton">start</button>
+		<button id="pauseButton">pause</button>
+		<button id="restartButton">restart</button>
+		
+		<p class="body_counter clearfix">0</p>
+		<div class="hack">
+			<div id="ekansArea">
+				<div id="ekansHead"></div>
+			</div>
+		</div>
+		<div id="arrows">
+			<button id="turnLeft">left</button>
+			<button id="turnRight">right</button>
+			<button id="turnUp">up</button>
+			<button id="turnDown">down</button>
+		</div>
+		<div class="clearfix"></div>		
+		<div id="todo_list" class="clearfix">
+			<h2>TODO:</h2>
+			<ol>
+				<li>A bonusz-csomag( a kódban "new_item" ) bedobálását automatizálni, valamint randomizálni kell.</li>
+				<li>IE-ben nem működik!!.</li>
+				<li>
+				<p>Falnak ütközéskor, túl gyorsan végetér a játék. Egy lépésnyi időt várni kellene... Átgondolni!!</p>
+					<pre>
+function stop() {
+	// mielött ténylegesen végetér a játék, adok még egy esélyt arra, hogy elnavigálj.
+	//code here
+	clearInterval(s);
+	// start pause restart buttons
+	startButton.disabled = true;
+	pauseButton.disabled = true;
+	restartButton.disabled = false;
+	//wayselector buttons
+	wsb_off();
+	alert('Fuckin looooooooooooooser.  Your score: ' + score);		
+}					
+					</pre>				
+				</li>
+				<li>
+					<p>Természetesen a ".remove()" methodus sem működik minden böngészőben.</p>
+					<p>43-46. sor</p>
+					<pre>
+function eat_item(item) {
+	build_body();
+	item.remove();
+}						
+					</pre>
+					<h3>A megoldást valószínűleg az fogja jelenteni, hogy nem törlöm az elemet a DOM-ból, hanem szimplán csak áthelyezem.</h3>					
+				</li>
+				<li>
+					<p>Egyenlőre eléggé teleszemetelem a memóriát, mivel minden lépés koordinátáját elmentem.</p>
+					<p>47-54. sor</p>
+					<pre>
+function set_hc() {
+	x = ekansHead.offsetTop;
+	y = ekansHead.offsetLeft;
+	pos = [x, y]	// x = margin top, y = margin left
+	hc[i] = pos		// hc[ [x0, y0], [x1, y1], [xN, yN], ]
+	i++;
+	return hc
+}						
+					</pre>
+					<p>A haszontalan koordinátákat törölni kell!</p>					
+				</li>				
+			</ol>
+		</div>
+	</body>
+</html>
