@@ -10,9 +10,8 @@
 }
 #ekansArea {
 	position: relative;
-	width: 680px;			/*Ezt a szarságot: a border miatt 1px-el tobb kell...*/
-	height: 280px;			/*Ezt a szarságot: a border miatt 1px-el tobb kell...*/
-	/*border: 1px solid;*/
+	width: 680px;
+	height: 280px;
 	display: block;
 	/*float:left;*/
 }
