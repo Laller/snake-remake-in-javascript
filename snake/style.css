@@ -1,0 +1,46 @@
+.clearfix:before,
+.clearfix:after {
+  display: inline-block;
+  line-height: 0;
+  content: "";
+  clear: both;
+}
+.clearfix:after {
+  clear: both;
+}
+#ekansArea {
+	position: relative;
+	width: 400px;
+	height: 200px;
+	display: block;
+	/*float:left;*/
+}
+.hack {
+	display: inline-block;
+	border: 1px solid;
+}
+#ekansHead {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: #000;
+	border: 1px solid white;
+	display: inline-block;
+	z-index:300
+}
+#bonus_item{
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: green;
+	border: 1px solid white;
+	display: inline-block;
+}
+.ekansBody {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	background: red;
+	border: 1px solid white;
+	display: inline-block;
+}
