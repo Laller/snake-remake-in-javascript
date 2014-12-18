@@ -10,8 +10,8 @@
 }
 #ekansArea {
 	position: relative;
-	width: 680px;
-	height: 280px;
+	width: 400px;
+	height: 200px;
 	display: block;
 	/*float:left;*/
 }
@@ -25,19 +25,15 @@
 	height: 8px;
 	background: #000;
 	border: 1px solid white;
-	margin-top: 250px;
-	margin-left: 450px;
 	display: inline-block;
 	z-index:300
 }
-#new_item{
+#bonus_item{
 	position: absolute;
 	width: 8px;
 	height: 8px;
 	background: green;
 	border: 1px solid white;
-	margin-top: 0px;
-	margin-left: 100px;
 	display: inline-block;
 }
 .ekansBody {
@@ -45,15 +41,6 @@
 	width: 8px;
 	height: 8px;
 	background: red;
-	margin-top: 0px;
-	margin-left: 100px;
 	border: 1px solid white;
 	display: inline-block;
-}
-#todo_list {
-	position:relative;	
-}
-#todo_list li {
-	margin-top: 1em;
-	background: #ddd;	
 }

@@ -1,96 +1,127 @@
 window.onload = function() {
+	// BUG: IE-ben nem működik...
 	var 
+		// Mindegy milyen szélességet és magasságot állítok be a pályának, a lényeg, hogy 10-el osztható legyen.	
+		ah = ekansArea.offsetHeight;
+		aw = ekansArea.offsetWidth;
+		body_height = ekansHead.offsetHeight;	
 		ekansHead = document.getElementById('ekansHead');
 		ekansArea = document.getElementById('ekansArea');
-		topPos = ekansHead.offsetTop;
-		leftPos = ekansHead.offsetLeft;	
-		step = 10;
-		way = "up";
-		what_way = "";
+		head_topPos = ekansHead.offsetTop;	// a kigyó fejének margintop-ja
+		head_leftPos = ekansHead.offsetLeft;	// a kigyó fejének marginleft-je
+		step = 10;						// 10px-es lépésközökben mozog a hüllő
+		way = "right";
+		old_way = "";
 		hc = new Array();	//head coordinates
 		pos = new Array();	//head position [x, y]
-		i = 0;
-		a = 0;				//step counter
+		i = 0;				//step counter
 		body_num = 3;
 		score = 0;
-		speed = 150;
+		speed = 100;
 		s = 0;
-		ah = ekansArea.offsetHeight;
-		aw = ekansArea.offsetWidth;		
-		body_height = ekansHead.offsetHeight;
-		last_chance = true;
 		
 		$('p.body_counter').text('SCORE:' + score)
 			
 		function build_body() {
-			for ( var c = 1; c <= body_num; c++ ) {                                //
+			for ( var c = 1; c <= body_num; c++ ) {
 				has_body_item = document.getElementById('ekansBody' + c);
-				//kiegésziteni, mivel az uj bodi fixen a bal felső sarokba kerül
-				//minimum a new_item -el fedésbe kell igazítani.	
 				if (!has_body_item) {
 					$('div#ekansArea').append(     
-						'<div id="ekansBody' + c + '" class="ekansBody"></div>'         
+						'<div id="ekansBody' + c + '" class="ekansBody" style="margin-top:' + head_topPos + 'px; margin-left:' + head_leftPos + 'px;"></div>'         
 						);
 				}
 			}
 		}
-		function random_coordinates() {				// random koordináták generálása a cél...
-													//ami nem egyezhet a kigyó egyetlen elemének koordinátájáway!
-		}  											//
-		function put_new_item() {
-			$('div#ekansArea').append(                 
-			'<div id="new_item" class=""></div>'       
-			);                                         
+		//coordinates for bonus_item
+			var all_coords = new Array();
+			var x_y = new Array();
+			var num_x = ( ah - body_height );
+			var num_y = ( aw - body_height );
+			for ( var cy = 0; cy <= num_y; cy++) {	//margin-lefts
+				for ( var cx = 0; cx <= num_x; cx++ ) {	//margin-tops
+					if ( cx % body_height == 0 && cy % body_height == 0) {
+						all_coords[all_coords.length] = [cy, cx];
+					}
+				}
+			}
+		// random numbers | 0 - all_coords.length
+		function random_nums() {
+			var max = all_coords.length + 1;
+			// TODO: kiegészíteni, hogy ne eshessen egybe a kígyó egyetlen elemével sem,
+			return Math.floor(Math.random() * max) 
+		}		
+		function put_bonus_item() {
+			var rn = random_nums();
+			var y_x = all_coords[rn]
+			$('div#ekansArea').append(
+			'<div id="bonus_item" style="margin-top:' + y_x[1] + 'px; margin-left:' + y_x[0] + 'px;"></div>'
+			);
 		}
 		function eat_item(item) {
 			build_body();
+			// BUG: a Chrome kivételével, a böngészők nem szeretik a remove() methodust.
 			item.remove();
 		}
+		function canibalizm() {
+			//console.log(hc)
+			// logika
+			return true;
+		}
 		function set_hc() {
+			// TODO: a tömb hosszát maximalizálni kell, kb body_num + 10 -re
 			x = ekansHead.offsetTop;
 			y = ekansHead.offsetLeft;
 			pos = [x, y]	// x = margin top, y = margin left
 			hc[i] = pos		// hc[ [x0, y0], [x1, y1], [xN, yN], ]
 			i++;
+			// reset hc, reset i
+			var limit = 100;
+			var hc_max_size = body_num + limit + 1;	// +1: snake head!!
+			if ( i == hc_max_size ) {
+				hc.splice( 0, limit )
+				i -= limit ;			
+			}
 			return hc
 		}
-		function follow_them(hc, a, body_item, b) {
-			bpos = hc[a-b];
+		function follow_them(hc, i, body_item, b) {
+			bpos = hc[i-b];
 			bod_topPos = bpos[0];
 			bod_leftPos = bpos[1];
 			body_item.style.marginTop = bod_topPos.toString() + "px";
 			body_item.style.marginLeft = bod_leftPos.toString() + "px";
 		}
 		function whereDoIgo(what_way){
-			var old_way = way;
-			if ( what_way ) { 
-				way = what_way;
+			old_way = way;
+			if ( what_way ) {
+				if ( what_way == "right" &&  old_way == "left" || what_way == "left" &&  old_way == "right" || what_way == "up" &&  old_way == "down" || what_way == "down" &&  old_way == "up" ) { 
+					way = old_way 
+					} else {
+						way = what_way;
+					}
 				} else { way = old_way }
 			return way;
-		}		
+		}
 		function letMove(way) {
-			hc = set_hc();	// idővel eléggé megtelik ez a fos. célszerű X lépésenként az utolsó Y (a) lépésekkel egy új tömböt létrehozni
-			a++;	//de inkább leszarom, de esetleg ha csinálok egy új tömböt, amibe elkezdem lerakni a koordinátákat és mondjuk 20 lépés után átváltok rá??Két tömmb között
+			hc = set_hc();
 			for ( var b = 1; b <= body_num; b++ ) {
 				// b counts body items and calls them
 				body_item = document.getElementById('ekansBody' + b);
 				if ( body_item && hc.length > b ) {
-					follow_them(hc, a, body_item, b);
+					follow_them(hc, i, body_item, b);
 				}
-			}	
-			new_item = document.getElementById('new_item');
-			if ( !new_item ) {
-				put_new_item();
+			}
+			// TODO: több bonusz kezelésére felkészíteni
+			bonus_item = document.getElementById('bonus_item');
+			if ( !bonus_item ) {
+				put_bonus_item();
 			} else {
-				head_topPos = ekansHead.offsetTop;
-				head_leftPos = ekansHead.offsetLeft;
-				new_item = document.getElementById('new_item');
-				new_item_topPos = new_item.offsetTop;
-				new_item_leftPos = new_item.offsetLeft;
-				if ( head_topPos == new_item_topPos && head_leftPos == new_item_leftPos ) {
+				bonus_item = document.getElementById('bonus_item');
+				bonus_item_topPos = bonus_item.offsetTop;
+				bonus_item_leftPos = bonus_item.offsetLeft;
+				if ( head_topPos == bonus_item_topPos && head_leftPos == bonus_item_leftPos ) {
 					body_num++;
 					score++;
-					eat_item(new_item);
+					eat_item( bonus_item );
 					$('p.body_counter').text('SCORE:' + score);
 				}				
 			}
@@ -110,51 +141,49 @@ window.onload = function() {
 			}			
 		}
 		function moveUp() {
-			if ( topPos > 0 && way == "up") {
-				topPos -= step;
-				ekansHead.style.marginTop = topPos.toString() + "px";
+			canibalizm_no = canibalizm();
+			if ( head_topPos > 0 && way == "up" && canibalizm_no ) {
+				head_topPos -= step;
+				ekansHead.style.marginTop = head_topPos.toString() + "px";
 			} else {
 				stop();
-				//way = "left";
 			}
 		}
 		function moveDown() {
-			var diff =  ( 2 * body_height )
-			var over_bottom = ( ah - diff )
-			if ( topPos <= over_bottom && way == "down") {
-				topPos += step;
-				ekansHead.style.marginTop = topPos.toString() + "px";
+			canibalizm_no = canibalizm();
+			var over_bottom = ( ah - body_height )
+			if ( head_topPos < over_bottom && way == "down" && canibalizm_no ) {
+				head_topPos += step;
+				ekansHead.style.marginTop = head_topPos.toString() + "px";
 			} else {
 				stop();
-				//way = "right";
 				}
 		}
 		function moveLeft() {
-			if ( leftPos > 0 && way == "left") {
-				leftPos -= step;
-				ekansHead.style.marginLeft = leftPos.toString() + "px";
+			canibalizm_no = canibalizm();
+			if ( head_leftPos > 0 && way == "left" && canibalizm_no ) {
+				head_leftPos -= step;
+				ekansHead.style.marginLeft = head_leftPos.toString() + "px";
 			} else {
 				stop();
-				//way = "down";
 				} 
 		}
 		function moveRight() {
-			var diff = ( 2 * body_height )
-			var over_right = ( aw - diff )
-			if ( leftPos <= over_right && way == "right") {			
-				leftPos += step;
-				ekansHead.style.marginLeft = leftPos.toString() + "px";
+			canibalizm_no = canibalizm();
+			var over_right = ( aw - body_height )
+			if ( head_leftPos < over_right && way == "right" && canibalizm_no ) {			
+				head_leftPos += step;
+				ekansHead.style.marginLeft = head_leftPos.toString() + "px";
 			} else {
 				stop();
-				//way = "up";
 				} 
 		}		
-		function go() { 
-			build_body();
-			way = whereDoIgo(what_way);
+		function go() {
+			build_body();		
+			way = whereDoIgo(way);
 			s = setInterval( function() {
-				letMove(way)
-				}, speed)
+				letMove(way);
+				}, speed)				
 		}		
 		function start() {
 			// start pause restart buttons
@@ -163,7 +192,7 @@ window.onload = function() {
 			restartButton.disabled = false;
 			//wayselector buttons ON
 			wsb_on()
-			if (ekansHead) {
+			if ( ekansHead ) {
 				go();
 			}		
 		}
@@ -172,26 +201,26 @@ window.onload = function() {
 			// start pause restart buttons
 			startButton.disabled = false;
 			pauseButton.disabled = true;
-			//wayselector buttons
+			//wayselector buttons OFF
 			wsb_off();
 		}
 		function restart() {
 			location.reload();
 		}
-		function chance() {
-			//go();
-		}
 		function stop() {
-			if ( !last_chance ) { 
-				clearInterval(s);
-				// start pause restart buttons
-				startButton.disabled = true;
-				pauseButton.disabled = true;
-				restartButton.disabled = false;
-				//wayselector buttons
-				wsb_off();
-				alert('Fuckin looooooooooooooser.  Your score: ' + score);			
-			} else { chance(); }
+			clearInterval(s);						// Game Over elött van egy lépésnyi esély
+			if ( old_way != way ) {					// új utirányt megadni.
+				canibalizm_no = true;
+				go();
+			} else {
+			// start pause restart buttons
+			startButton.disabled = true;
+			pauseButton.disabled = true;
+			restartButton.disabled = false;
+			//wayselector buttons
+			wsb_off();
+			alert('GAME OVER!  Your score: ' + score);
+			}
 		}
 		//wayselector buttons OFF
 		function wsb_off() {
@@ -226,18 +255,19 @@ window.onload = function() {
 	document.onkeydown = 
 	function(e) {
 	//console.log(e.keyCode);
+	// TODO: space to pause
 		switch (e.keyCode) {
 			case 65:					// a
-			whereDoIgo('left');
+			what_way = whereDoIgo('left');
 			break;			
 			case 87:					// w
-			whereDoIgo('up');
+			what_way = whereDoIgo('up');
 			break;		
 			case 68:					// d
-			whereDoIgo('right');
+			what_way = whereDoIgo('right');
 			break;		
 			case 83:					// s
-			whereDoIgo('down');
+			what_way = whereDoIgo('down');
 			break;		
 		}
 	}
