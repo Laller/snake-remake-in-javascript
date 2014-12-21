@@ -285,7 +285,6 @@ window.onload = function() {
 			body_num = 3;
 			way = "right";
 			all_score = score + zero_score();
-			speed = 100;
 			write_msg();
 			startButton.disabled = false;
 			pauseButton.disabled = true;
