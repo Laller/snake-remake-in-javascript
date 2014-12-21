@@ -24,7 +24,7 @@ window.onload = function() {
 		mistake = 0;
 		s = 0;
 		sl = score_limit()
-		speed = 100;
+		speed = 70;
 		all_coords = ekansArea_coords();	// all coordinates of ekansArea
 		write_msg();
 		
